@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
+export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
 
 export class ApiError extends Error {
   constructor(
@@ -16,6 +16,7 @@ type Opciones = {
   body?: unknown;
   token?: string | null;
   signal?: AbortSignal;
+  headers?: Record<string, string>;
 };
 
 let onNoAutorizado: (() => void) | null = null;
@@ -34,13 +35,14 @@ function mensajeDeError(status: number, body: unknown): string {
   return `Error ${status}`;
 }
 
-export async function api<T>(ruta: string, { method = 'GET', body, token, signal }: Opciones = {}): Promise<T> {
+export async function api<T>(ruta: string, { method = 'GET', body, token, signal, headers }: Opciones = {}): Promise<T> {
   let res: Response;
   try {
     res = await fetch(`${API_URL}${ruta}`, {
       method,
       signal,
       headers: {
+        ...headers,
         ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },

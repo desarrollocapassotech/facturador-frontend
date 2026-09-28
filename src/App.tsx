@@ -1,7 +1,11 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { RequireAuth } from './auth/RequireAuth';
 import { AppLayout } from './components/AppLayout';
-import { InicioPage } from './pages/InicioPage';
+import { ClientesPage } from './pages/clientes/ClientesPage';
+import { ComprobanteDetallePage } from './pages/comprobantes/ComprobanteDetallePage';
+import { ComprobantesPage } from './pages/comprobantes/ComprobantesPage';
+import { NuevoComprobantePage } from './pages/comprobantes/NuevoComprobantePage';
+import { ConfiguracionPage } from './pages/configuracion/ConfiguracionPage';
 import { LoginPage } from './pages/LoginPage';
 
 export default function App() {
@@ -15,7 +19,12 @@ export default function App() {
           </RequireAuth>
         }
       >
-        <Route index element={<InicioPage />} />
+        <Route index element={<Navigate to="/comprobantes" replace />} />
+        <Route path="comprobantes" element={<ComprobantesPage />} />
+        <Route path="comprobantes/nuevo" element={<NuevoComprobantePage />} />
+        <Route path="comprobantes/:id" element={<ComprobanteDetallePage />} />
+        <Route path="clientes" element={<ClientesPage />} />
+        <Route path="configuracion" element={<ConfiguracionPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
