@@ -26,21 +26,31 @@ function formInicial(c?: Cliente | null) {
   };
 }
 
+export type ValoresInicialesCliente = Partial<Pick<Cliente, 'razonSocial' | 'tipoDocumento' | 'numeroDocumento' | 'condicionIva' | 'domicilio' | 'email'>>;
+
 /** Alta o edición de un cliente. Montarlo con `key` distinta por cliente para reiniciar el formulario. */
 export function ClienteModal({
   abierto,
   cliente,
+  valoresIniciales,
   onCerrar,
   onGuardado,
 }: {
   abierto: boolean;
   cliente?: Cliente | null;
+  /** Para un alta: datos sugeridos (por ejemplo, los que trajo una importación). */
+  valoresIniciales?: ValoresInicialesCliente;
   onCerrar: () => void;
   onGuardado?: (c: Cliente) => void;
 }) {
   const { pedir } = useApi();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState(() => formInicial(cliente));
+  const [form, setForm] = useState(() => {
+    const base = formInicial(cliente);
+    if (cliente || !valoresIniciales) return base;
+    const v = Object.fromEntries(Object.entries(valoresIniciales).filter(([, x]) => x !== undefined && x !== null));
+    return { ...base, ...v };
+  });
   const [avisoPadron, setAvisoPadron] = useState<string | null>(null);
 
   function cambiar<K extends keyof typeof form>(campo: K, valor: (typeof form)[K]) {

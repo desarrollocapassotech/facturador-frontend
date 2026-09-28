@@ -54,18 +54,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => controller.abort();
   }, [logout]);
 
+  const abrirSesion = useCallback(async (accessToken: string) => {
+    tokenRef.current = accessToken;
+    guardar(CLAVE_TOKEN, accessToken);
+    const perfil = await api<PerfilResponse>('/auth/me', { token: accessToken });
+    setUsuario(perfil.usuario);
+    setTenant(perfil.tenant);
+    setEstado('autenticado');
+  }, []);
+
   const login = useCallback<AuthState['login']>(async (email, password, tenantSlug) => {
     try {
       const sesion = await api<SesionResponse>('/auth/login', {
         method: 'POST',
         body: { email, password, ...(tenantSlug ? { tenantSlug } : {}) },
       });
-      tokenRef.current = sesion.accessToken;
-      guardar(CLAVE_TOKEN, sesion.accessToken);
-      const perfil = await api<PerfilResponse>('/auth/me', { token: sesion.accessToken });
-      setUsuario(perfil.usuario);
-      setTenant(perfil.tenant);
-      setEstado('autenticado');
+      await abrirSesion(sesion.accessToken);
       return { ok: true };
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
@@ -74,11 +78,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       throw err;
     }
-  }, []);
+  }, [abrirSesion]);
+
+  /** Entrada sin contraseña desde un sistema integrado (token de un solo uso). */
+  const canjearAcceso = useCallback<AuthState['canjearAcceso']>(
+    async (token) => {
+      const sesion = await api<SesionResponse & { destino: string | null }>('/auth/acceso/canjear', {
+        method: 'POST',
+        body: { token },
+      });
+      await abrirSesion(sesion.accessToken);
+      return { destino: sesion.destino };
+    },
+    [abrirSesion],
+  );
 
   const valor = useMemo<AuthState>(
-    () => ({ estado, usuario, tenant, getToken: () => tokenRef.current, login, logout }),
-    [estado, usuario, tenant, login, logout],
+    () => ({ estado, usuario, tenant, getToken: () => tokenRef.current, login, canjearAcceso, logout }),
+    [estado, usuario, tenant, login, canjearAcceso, logout],
   );
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>;

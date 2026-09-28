@@ -168,6 +168,147 @@ export interface Comprobante {
   advertenciaLetra: string | null;
 }
 
+// ── Fase 4: integraciones e importaciones ─────────────────────────────────
+
+export type OrigenItem = 'TRACKER' | 'API' | 'EXCEL' | 'MANUAL';
+export type Scope = 'items:write' | 'comprobantes:write' | 'comprobantes:read' | 'acceso:emitir';
+export type EstadoItem = 'VALIDO' | 'CON_ERRORES' | 'DUPLICADO' | 'EN_BORRADOR' | 'FACTURADO' | 'DESCARTADO';
+export type EstadoImportacion = 'EN_STAGING' | 'CONFIRMADA' | 'DESCARTADA' | 'FALLIDA';
+export type BaseHoras = 'FACTURABLES' | 'TRABAJADAS';
+
+export interface Integracion {
+  id: string;
+  nombre: string;
+  origen: OrigenItem;
+  keyPrefijo: string;
+  scopes: Scope[];
+  ultimoUsoEn: string | null;
+  revocadaEn: string | null;
+  createdAt: string;
+}
+
+export type ConexionTracker =
+  | { configurada: false }
+  | { configurada: true; baseUrl: string; apiKeyPista: string; ultimaPruebaEn: string | null; ultimoError: string | null };
+
+export interface Tarifa {
+  id: string;
+  clienteId: string;
+  cliente: { id: string; razonSocial: string };
+  origen: OrigenItem | null;
+  claveExterna: string | null;
+  descripcion: string | null;
+  unidad: Unidad;
+  precioUnitario: string;
+  moneda: Moneda;
+  alicuotaIva: string;
+  vigenteDesde: string;
+  vigenteHasta: string | null;
+}
+
+export type CampoMapeo =
+  | 'referenciaExterna'
+  | 'descripcion'
+  | 'cantidad'
+  | 'unidad'
+  | 'precioUnitario'
+  | 'moneda'
+  | 'alicuotaIva'
+  | 'fecha'
+  | 'periodo.desde'
+  | 'periodo.hasta'
+  | 'cliente.numeroDocumento'
+  | 'cliente.tipoDocumento'
+  | 'cliente.referenciaExterna'
+  | 'cliente.razonSocial'
+  | `metadatos.${string}`;
+
+export interface ColumnaMapeo {
+  campo: CampoMapeo;
+  encabezado: string;
+  alias?: string[];
+  tipo: 'texto' | 'numero' | 'fecha' | 'decimal';
+  formatoFecha?: string;
+  separadorDecimal?: ',' | '.';
+}
+
+export interface PlantillaMapeoConfig {
+  hoja?: string | number;
+  filaEncabezado: number;
+  delimitador?: ',' | ';' | '\t';
+  encoding?: 'utf-8' | 'latin1';
+  columnas: ColumnaMapeo[];
+  valoresPorDefecto?: { unidad?: Unidad; alicuotaIva?: string; moneda?: Moneda };
+  referencia?: { columnas: string[] };
+}
+
+export interface PlantillaMapeo {
+  id: string;
+  nombre: string;
+  formato: 'xlsx' | 'csv';
+  config: PlantillaMapeoConfig;
+  activa: boolean;
+}
+
+export interface Advertencia {
+  referencia?: string;
+  mensaje: string;
+}
+
+export interface Importacion {
+  id: string;
+  origen: OrigenItem;
+  estado: EstadoImportacion;
+  descripcion: string | null;
+  parametros: Record<string, unknown> | null;
+  advertencias: Advertencia[] | null;
+  totalItems: number;
+  validos: number;
+  conErrores: number;
+  duplicados: number;
+  actualizados: number;
+  createdAt: string;
+  confirmadaEn: string | null;
+  estadosItems?: Partial<Record<EstadoItem, number>>;
+}
+
+export interface ItemFacturable {
+  id: string;
+  importacionId: string | null;
+  origen: OrigenItem;
+  referenciaExterna: string;
+  clienteId: string | null;
+  cliente: { id: string; razonSocial: string } | null;
+  clienteTipoDocumento: TipoDocumento | null;
+  clienteNumeroDocumento: string | null;
+  clienteReferenciaExterna: string | null;
+  clienteAlta: { razonSocial: string; condicionIva?: string; domicilio?: string; email?: string } | null;
+  descripcion: string;
+  cantidad: string;
+  unidad: Unidad;
+  precioUnitario: string;
+  moneda: Moneda;
+  alicuotaIva: string;
+  fecha: string | null;
+  periodoDesde: string | null;
+  periodoHasta: string | null;
+  metadatos: {
+    precioDeTarifa?: boolean;
+    tarifaId?: string | null;
+    horasTrabajadas?: string;
+    horasFacturables?: string;
+    baseHoras?: BaseHoras;
+    registros?: number;
+    proyecto?: { id: string; nombre: string; billingType: string | null };
+    valoresOriginales?: Record<string, string>;
+    fila?: number;
+    [clave: string]: unknown;
+  } | null;
+  estado: EstadoItem;
+  errores: Array<{ campo: string; mensaje: string }> | null;
+  comprobanteId: string | null;
+}
+
 export interface Paginado<T> {
   total: number;
   pagina: number;

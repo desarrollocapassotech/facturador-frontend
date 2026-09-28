@@ -22,11 +22,17 @@ export function useApi() {
   );
 
   const subir = useCallback(
-    async <T>(ruta: string, campo: string, archivo: File): Promise<T> => {
+    async <T>(
+      ruta: string,
+      campo: string,
+      archivo: File,
+      opciones: { method?: 'PUT' | 'POST'; campos?: Record<string, string | undefined> } = {},
+    ): Promise<T> => {
       const form = new FormData();
+      for (const [k, v] of Object.entries(opciones.campos ?? {})) if (v !== undefined) form.append(k, v);
       form.append(campo, archivo);
       const res = await fetch(`${API_URL}${ruta}`, {
-        method: 'PUT',
+        method: opciones.method ?? 'PUT',
         headers: { Authorization: `Bearer ${getToken()}` },
         body: form,
       });

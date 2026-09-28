@@ -30,6 +30,8 @@ export interface AuthState {
   tenant: TenantSesion | null;
   getToken: () => string | null;
   login: (email: string, password: string, tenantSlug?: string) => Promise<ResultadoLogin>;
+  /** Canjea un token de acceso de un solo uso (ver /acceso). Devuelve a dónde ir. */
+  canjearAcceso: (token: string) => Promise<{ destino: string | null }>;
   logout: () => void;
 }
 
