@@ -7,7 +7,8 @@ type Metodo = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 async function errorDeRespuesta(res: Response): Promise<ApiError> {
   const data = await res.json().catch(() => null);
   const msg = (data as { message?: unknown } | null)?.message;
-  return new ApiError(res.status, typeof msg === 'string' ? msg : `Error ${res.status}`, data);
+  const texto = Array.isArray(msg) ? msg.join(' ') : typeof msg === 'string' ? msg : `Error ${res.status}`;
+  return new ApiError(res.status, texto, data);
 }
 
 /** Cliente de la API con la sesión actual. */
@@ -38,10 +39,17 @@ export function useApi() {
     [getToken, logout],
   );
 
-  /** Descarga un archivo autenticado (PDF) y dispara la descarga en el navegador. */
+  /** Descarga un archivo autenticado (PDF) y dispara la descarga en el navegador. Con `body`, hace POST. */
   const descargar = useCallback(
-    async (ruta: string, nombrePorDefecto: string) => {
-      const res = await fetch(`${API_URL}${ruta}`, { headers: { Authorization: `Bearer ${getToken()}` } });
+    async (ruta: string, nombrePorDefecto: string, body?: unknown) => {
+      const res = await fetch(`${API_URL}${ruta}`, {
+        method: body === undefined ? 'GET' : 'POST',
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
+        },
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
       if (!res.ok) {
         if (res.status === 401) logout();
         throw await errorDeRespuesta(res);

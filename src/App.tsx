@@ -7,6 +7,7 @@ import { ComprobantesPage } from './pages/comprobantes/ComprobantesPage';
 import { NuevoComprobantePage } from './pages/comprobantes/NuevoComprobantePage';
 import { ConfiguracionPage } from './pages/configuracion/ConfiguracionPage';
 import { LoginPage } from './pages/LoginPage';
+import { RecibosPage } from './pages/recibos/RecibosPage';
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="comprobantes" element={<ComprobantesPage />} />
         <Route path="comprobantes/nuevo" element={<NuevoComprobantePage />} />
         <Route path="comprobantes/:id" element={<ComprobanteDetallePage />} />
+        <Route path="recibos" element={<RecibosPage />} />
         <Route path="clientes" element={<ClientesPage />} />
         <Route path="configuracion" element={<ConfiguracionPage />} />
       </Route>

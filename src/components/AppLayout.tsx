@@ -4,6 +4,7 @@ import { useAuth } from '@/auth/auth-context';
 
 const NAV = [
   { a: '/comprobantes', texto: 'Comprobantes' },
+  { a: '/recibos', texto: 'Recibos' },
   { a: '/clientes', texto: 'Clientes' },
   { a: '/configuracion', texto: 'Configuración' },
 ];
