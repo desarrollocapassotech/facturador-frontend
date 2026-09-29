@@ -4,6 +4,7 @@ import { AlertaError, Aviso, Boton, Campo, Cargando, Entrada, Etiqueta, Modal, S
 import { fechaHora, ORIGENES, SCOPES } from '@/lib/formato';
 import type { Integracion, OrigenItem, Scope } from '@/lib/tipos';
 import { useApi } from '@/lib/useApi';
+import { URL_DOCS } from './WebhooksSeccion';
 
 export function IntegracionesSeccion() {
   const { pedir } = useApi();
@@ -24,6 +25,11 @@ export function IntegracionesSeccion() {
       <Tarjeta titulo="Sistemas integrados">
         <p className="mb-3 text-sm text-slate-600">
           Cada sistema que se conecta con el Facturador (por ejemplo, el botón “Ir al facturador” del tracker) usa su propia API key.
+          Qué puede hacer cada permiso y cómo usar la API está en la{' '}
+          <a href={URL_DOCS} target="_blank" rel="noreferrer" className="underline">
+            documentación de la API
+          </a>
+          .
         </p>
         {data.length === 0 ? (
           <Vacio>Todavía no hay integraciones.</Vacio>

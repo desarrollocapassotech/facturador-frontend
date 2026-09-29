@@ -8,6 +8,7 @@ import { PlantillasMapeoSeccion } from './PlantillasMapeoSeccion';
 import { PuntosVentaSeccion } from './PuntosVentaSeccion';
 import { TarifasSeccion } from './TarifasSeccion';
 import { TrackerSeccion } from './TrackerSeccion';
+import { WebhooksSeccion } from './WebhooksSeccion';
 
 const PESTANAS = [
   { id: 'emisor', texto: 'Datos del emisor' },
@@ -18,6 +19,7 @@ const PESTANAS = [
   { id: 'tracker', texto: 'Tracker' },
   { id: 'mapeo', texto: 'Plantillas Excel' },
   { id: 'integraciones', texto: 'Integraciones' },
+  { id: 'webhooks', texto: 'Webhooks' },
 ] as const;
 
 type Pestana = (typeof PESTANAS)[number]['id'];
@@ -58,6 +60,7 @@ export function ConfiguracionPage() {
       {pestana === 'tracker' && <TrackerSeccion />}
       {pestana === 'mapeo' && <PlantillasMapeoSeccion />}
       {pestana === 'integraciones' && <IntegracionesSeccion />}
+      {pestana === 'webhooks' && <WebhooksSeccion />}
     </div>
   );
 }
