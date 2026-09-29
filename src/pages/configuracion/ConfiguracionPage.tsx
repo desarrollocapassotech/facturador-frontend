@@ -5,6 +5,7 @@ import { EstadoArcaTarjeta } from './EstadoArcaTarjeta';
 import { IntegracionesSeccion } from './IntegracionesSeccion';
 import { PlantillaSeccion } from './PlantillaSeccion';
 import { PlantillasMapeoSeccion } from './PlantillasMapeoSeccion';
+import { ProduccionSeccion } from './ProduccionSeccion';
 import { PuntosVentaSeccion } from './PuntosVentaSeccion';
 import { TarifasSeccion } from './TarifasSeccion';
 import { TrackerSeccion } from './TrackerSeccion';
@@ -15,6 +16,7 @@ const PESTANAS = [
   { id: 'puntos', texto: 'Puntos de venta' },
   { id: 'certificados', texto: 'Certificados ARCA' },
   { id: 'plantilla', texto: 'Plantilla PDF' },
+  { id: 'produccion', texto: 'Producción' },
   { id: 'tarifas', texto: 'Tarifas' },
   { id: 'tracker', texto: 'Tracker' },
   { id: 'mapeo', texto: 'Plantillas Excel' },
@@ -56,6 +58,7 @@ export function ConfiguracionPage() {
       {pestana === 'puntos' && <PuntosVentaSeccion />}
       {pestana === 'certificados' && <CertificadosSeccion />}
       {pestana === 'plantilla' && <PlantillaSeccion />}
+      {pestana === 'produccion' && <ProduccionSeccion />}
       {pestana === 'tarifas' && <TarifasSeccion />}
       {pestana === 'tracker' && <TrackerSeccion />}
       {pestana === 'mapeo' && <PlantillasMapeoSeccion />}
