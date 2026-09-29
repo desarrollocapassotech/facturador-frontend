@@ -132,6 +132,10 @@ export function AsistenteCertificado({ emisor, onClaveGenerada }: { emisor: Emis
               Buscá el servicio <strong>Administración de Certificados Digitales</strong>. Si no aparece: entrá a <strong>Administrador de
               Relaciones de Clave Fiscal</strong> → <strong>Adherir servicio</strong> → ARCA → Servicios interactivos → Administración de
               Certificados Digitales, confirmá y volvé a entrar.
+              <span className="mt-1 block text-xs text-slate-500">
+                Si ARCA responde “La autorización … arfe_certificado … ya existe”, no es un problema: el servicio ya estaba adherido.
+                Salí, volvé a entrar y buscalo en <strong>Mis servicios</strong> (o con el buscador).
+              </span>
             </li>
             <li>
               <strong>Agregar alias</strong>: escribí <code className="rounded bg-slate-100 px-1">{alias || 'facturador'}</code>, elegí el archivo{' '}
