@@ -4,6 +4,7 @@ import { AlertaError, Aviso, Boton, Campo, Cargando, Selector, Tarjeta, Vacio, c
 import { ambienteTexto, fecha } from '@/lib/formato';
 import type { Ambiente, Certificado, Emisor } from '@/lib/tipos';
 import { useApi } from '@/lib/useApi';
+import { AsistenteCertificado } from './AsistenteCertificado';
 
 const DIAS_AVISO = 30;
 
@@ -15,12 +16,24 @@ export function CertificadosSeccion() {
   const { pedir } = useApi();
   const certificados = useQuery({ queryKey: ['certificados'], queryFn: () => pedir<Certificado[]>('/configuracion/certificados') });
   const emisor = useQuery({ queryKey: ['emisor'], queryFn: () => pedir<Emisor>('/configuracion/emisor') });
+  const [claveGenerada, setClaveGenerada] = useState<string | null>(null);
 
   if (certificados.error) return <AlertaError error={certificados.error} />;
   if (!certificados.data || !emisor.data) return <Cargando />;
+  const tieneProduccion = certificados.data.some((c) => c.ambiente === 'PRODUCCION');
 
   return (
     <div className="space-y-4">
+      {!tieneProduccion || claveGenerada ? (
+        <AsistenteCertificado emisor={emisor.data} onClaveGenerada={setClaveGenerada} />
+      ) : (
+        <details className="rounded-lg border border-slate-200 bg-white p-4 text-sm shadow-sm">
+          <summary className="cursor-pointer font-medium">Renovar el certificado de producción (paso a paso)</summary>
+          <div className="mt-3">
+            <AsistenteCertificado emisor={emisor.data} onClaveGenerada={setClaveGenerada} />
+          </div>
+        </details>
+      )}
       <Tarjeta titulo="Certificados cargados">
         {certificados.data.length === 0 ? (
           <Vacio>
@@ -47,17 +60,21 @@ export function CertificadosSeccion() {
           </ul>
         )}
       </Tarjeta>
-      <CargarCertificado ambiente={emisor.data.ambienteArca} />
+      <CargarCertificado
+        key={claveGenerada ? 'con-clave' : 'manual'}
+        ambiente={claveGenerada ? 'PRODUCCION' : emisor.data.ambienteArca}
+        claveInicial={claveGenerada ?? ''}
+      />
     </div>
   );
 }
 
-function CargarCertificado({ ambiente }: { ambiente: Ambiente }) {
+function CargarCertificado({ ambiente, claveInicial }: { ambiente: Ambiente; claveInicial: string }) {
   const { pedir } = useApi();
   const queryClient = useQueryClient();
   const [amb, setAmb] = useState<Ambiente>(ambiente);
   const [cert, setCert] = useState('');
-  const [clave, setClave] = useState('');
+  const [clave, setClave] = useState(claveInicial);
   const [listo, setListo] = useState(false);
 
   const cargar = useMutation({
