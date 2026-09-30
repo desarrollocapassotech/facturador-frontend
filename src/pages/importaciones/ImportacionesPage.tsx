@@ -1,18 +1,10 @@
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AlertaError, Aviso, Boton, Campo, Cargando, Entrada, Etiqueta, Selector, Tarjeta, Vacio } from '@/components/ui';
-import { ESTADOS_IMPORTACION, fechaHora, hoy, ORIGENES } from '@/lib/formato';
-import type { BaseHoras, ConexionTracker, Importacion, Paginado, PlantillaMapeo } from '@/lib/tipos';
+import { AlertaError, Aviso, Boton, Campo, Cargando, Etiqueta, Selector, Tarjeta, Vacio } from '@/components/ui';
+import { ESTADOS_IMPORTACION, fechaHora, ORIGENES } from '@/lib/formato';
+import type { Importacion, Paginado, PlantillaMapeo } from '@/lib/tipos';
 import { useApi } from '@/lib/useApi';
-
-/** Primer y último día del mes anterior (lo habitual es facturar el mes cerrado). */
-function mesAnterior(): { desde: string; hasta: string } {
-  const [a, m] = hoy().split('-').map(Number);
-  const desde = new Date(Date.UTC(a, m - 2, 1));
-  const hasta = new Date(Date.UTC(a, m - 1, 0));
-  return { desde: desde.toISOString().slice(0, 10), hasta: hasta.toISOString().slice(0, 10) };
-}
 
 export function ImportacionesPage() {
   const { pedir } = useApi();
@@ -29,11 +21,10 @@ export function ImportacionesPage() {
       <div>
         <h1 className="text-xl font-semibold">Importaciones</h1>
         <p className="text-sm text-slate-500">
-          Traé lo que hay que facturar desde el tracker o desde una planilla, revisalo y generá los borradores en un paso.
+          Traé lo que hay que facturar desde una planilla (o desde otro sistema por la API), revisalo y generá los borradores en un paso.
         </p>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <ImportarTracker />
         <ImportarExcel />
       </div>
       <Tarjeta titulo="Historial">
@@ -95,73 +86,6 @@ export function ImportacionesPage() {
         )}
       </Tarjeta>
     </div>
-  );
-}
-
-function ImportarTracker() {
-  const { pedir } = useApi();
-  const navigate = useNavigate();
-  const conexion = useQuery({ queryKey: ['conexion-tracker'], queryFn: () => pedir<ConexionTracker>('/configuracion/tracker') });
-  const [rango, setRango] = useState(mesAnterior);
-  const [baseHoras, setBaseHoras] = useState<BaseHoras>('FACTURABLES');
-  const [agrupacion, setAgrupacion] = useState<'proyecto-mes' | 'registro'>('proyecto-mes');
-
-  const importar = useMutation({
-    mutationFn: () => pedir<Importacion>('/importaciones/tracker', 'POST', { ...rango, baseHoras, agrupacion }),
-    onSuccess: (imp) => navigate(`/importaciones/${imp.id}`),
-  });
-
-  function enviar(e: FormEvent) {
-    e.preventDefault();
-    importar.mutate();
-  }
-
-  if (conexion.data && !conexion.data.configurada) {
-    return (
-      <Tarjeta titulo="Horas del time tracker">
-        <Aviso tono="azul">
-          Para importar horas, conectá el tracker en{' '}
-          <Link to="/configuracion?tab=tracker" className="underline">
-            Configuración → Tracker
-          </Link>
-          .
-        </Aviso>
-      </Tarjeta>
-    );
-  }
-
-  return (
-    <Tarjeta titulo="Horas del time tracker">
-      <form onSubmit={enviar} className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Campo etiqueta="Desde">
-            <Entrada type="date" value={rango.desde} onChange={(e) => setRango((r) => ({ ...r, desde: e.target.value }))} required />
-          </Campo>
-          <Campo etiqueta="Hasta">
-            <Entrada type="date" value={rango.hasta} onChange={(e) => setRango((r) => ({ ...r, hasta: e.target.value }))} required />
-          </Campo>
-          <Campo etiqueta="Horas a facturar" ayuda="Se puede cambiar después por ítem.">
-            <Selector value={baseHoras} onChange={(e) => setBaseHoras(e.target.value as BaseHoras)}>
-              <option value="FACTURABLES">Facturables (las que calcula el tracker)</option>
-              <option value="TRABAJADAS">Trabajadas</option>
-            </Selector>
-          </Campo>
-          <Campo etiqueta="Una línea por">
-            <Selector value={agrupacion} onChange={(e) => setAgrupacion(e.target.value as 'proyecto-mes' | 'registro')}>
-              <option value="proyecto-mes">Proyecto y mes</option>
-              <option value="registro">Cada registro de horas</option>
-            </Selector>
-          </Campo>
-        </div>
-        <p className="text-xs text-slate-500">El precio sale de las tarifas del Facturador (Configuración → Tarifas), nunca de la tarifa del tracker.</p>
-        <AlertaError error={importar.error} />
-        <div className="flex justify-end">
-          <Boton type="submit" cargando={importar.isPending}>
-            Importar horas
-          </Boton>
-        </div>
-      </form>
-    </Tarjeta>
   );
 }
 

@@ -24,7 +24,7 @@ export function IntegracionesSeccion() {
     <div className="space-y-4">
       <Tarjeta titulo="Sistemas integrados">
         <p className="mb-3 text-sm text-slate-600">
-          Cada sistema que se conecta con el Facturador (por ejemplo, el botón “Ir al facturador” del tracker) usa su propia API key.
+          Cada sistema que se conecta con el Facturador (un ERP, un time tracker, una tienda) usa su propia API key.
           Qué puede hacer cada permiso y cómo usar la API está en la{' '}
           <a href={URL_DOCS} target="_blank" rel="noreferrer" className="underline">
             documentación de la API
@@ -97,8 +97,8 @@ function ClaveUnaVez({ nombre, clave, onListo }: { nombre: string; clave: string
         </Boton>
       </div>
       <p className="text-slate-600">
-        En el tracker va en la variable <code className="font-mono">FACTURADOR_API_KEY</code>, junto con{' '}
-        <code className="font-mono">FACTURADOR_API_URL</code> (la URL de la API del Facturador, terminada en <code>/api</code>).
+        Se configura del lado del otro sistema (nunca en un navegador), junto con la URL de la API del Facturador, terminada en{' '}
+        <code>/api</code>.
       </p>
       <div className="flex justify-end">
         <Boton onClick={onListo}>Listo, ya la guardé</Boton>
@@ -111,8 +111,8 @@ function NuevaIntegracion({ onCreada }: { onCreada: (nombre: string, clave: stri
   const { pedir } = useApi();
   const queryClient = useQueryClient();
   const [nombre, setNombre] = useState('');
-  const [origen, setOrigen] = useState<OrigenItem>('TRACKER');
-  const [scopes, setScopes] = useState<Scope[]>(['acceso:emitir']);
+  const [origen, setOrigen] = useState<OrigenItem>('API');
+  const [scopes, setScopes] = useState<Scope[]>(['items:write', 'comprobantes:write', 'comprobantes:read']);
 
   const crear = useMutation({
     mutationFn: () => pedir<{ integracion: Integracion; clave: string }>('/integraciones', 'POST', { nombre: nombre.trim(), origen, scopes }),
@@ -137,12 +137,12 @@ function NuevaIntegracion({ onCreada }: { onCreada: (nombre: string, clave: stri
       <form onSubmit={enviar} className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <Campo etiqueta="Nombre">
-            <Entrada value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Time tracker" required maxLength={100} />
+            <Entrada value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="ERP, tienda, time tracker…" required maxLength={100} />
           </Campo>
           <Campo etiqueta="Origen de sus datos">
             <Selector value={origen} onChange={(e) => setOrigen(e.target.value as OrigenItem)}>
-              <option value="TRACKER">{ORIGENES.TRACKER}</option>
               <option value="API">{ORIGENES.API}</option>
+              <option value="TRACKER">{ORIGENES.TRACKER}</option>
             </Selector>
           </Campo>
         </div>
@@ -154,7 +154,7 @@ function NuevaIntegracion({ onCreada }: { onCreada: (nombre: string, clave: stri
               {SCOPES[s]}
             </label>
           ))}
-          <p className="text-xs text-slate-500">Para el botón “Ir al facturador” del tracker alcanza con el primero.</p>
+          <p className="text-xs text-slate-500">Para facturar desde el otro sistema hacen falta los tres de ítems y comprobantes.</p>
         </fieldset>
         <AlertaError error={crear.error} />
         <div className="flex justify-end">

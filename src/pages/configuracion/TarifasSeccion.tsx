@@ -31,7 +31,7 @@ export function TarifasSeccion() {
     <div className="space-y-4">
       <Tarjeta titulo="Tarifas por cliente">
         <p className="mb-3 text-sm text-slate-600">
-          Se usan cuando un ítem importado llega sin precio (por ejemplo, las horas del tracker). Gana la más específica vigente: la del
+          Se usan cuando un ítem importado llega sin precio (por ejemplo, horas cargadas por la API). Gana la más específica vigente: la del
           proyecto sobre la del cliente, y la del origen sobre la general.
         </p>
         {data.length === 0 ? (
@@ -199,7 +199,7 @@ export function FormularioTarifa({ inicial, onCreada }: { inicial?: TarifaInicia
             ))}
           </Selector>
         </Campo>
-        <Campo etiqueta="Proyecto (id en el tracker)" ayuda="Opcional: para una tarifa distinta por proyecto.">
+        <Campo etiqueta="Clave de proyecto" ayuda="Opcional: la que manda el otro sistema, para una tarifa distinta por proyecto.">
           <Entrada value={form.claveExterna} onChange={(e) => cambiar('claveExterna', e.target.value)} maxLength={100} className="font-mono" />
         </Campo>
         <Campo etiqueta="Texto de la línea" ayuda="Opcional. Admite {proyecto} y {periodo}." className="sm:col-span-2 lg:col-span-3">

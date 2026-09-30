@@ -174,7 +174,6 @@ export type OrigenItem = 'TRACKER' | 'API' | 'EXCEL' | 'MANUAL';
 export type Scope = 'items:write' | 'comprobantes:write' | 'comprobantes:read' | 'acceso:emitir';
 export type EstadoItem = 'VALIDO' | 'CON_ERRORES' | 'DUPLICADO' | 'EN_BORRADOR' | 'FACTURADO' | 'DESCARTADO';
 export type EstadoImportacion = 'EN_STAGING' | 'CONFIRMADA' | 'DESCARTADA' | 'FALLIDA';
-export type BaseHoras = 'FACTURABLES' | 'TRABAJADAS';
 
 export interface Integracion {
   id: string;
@@ -186,10 +185,6 @@ export interface Integracion {
   revocadaEn: string | null;
   createdAt: string;
 }
-
-export type ConexionTracker =
-  | { configurada: false }
-  | { configurada: true; baseUrl: string; apiKeyPista: string; ultimaPruebaEn: string | null; ultimoError: string | null };
 
 export interface Tarifa {
   id: string;
@@ -295,11 +290,6 @@ export interface ItemFacturable {
   metadatos: {
     precioDeTarifa?: boolean;
     tarifaId?: string | null;
-    horasTrabajadas?: string;
-    horasFacturables?: string;
-    baseHoras?: BaseHoras;
-    registros?: number;
-    proyecto?: { id: string; nombre: string; billingType: string | null };
     valoresOriginales?: Record<string, string>;
     fila?: number;
     [clave: string]: unknown;

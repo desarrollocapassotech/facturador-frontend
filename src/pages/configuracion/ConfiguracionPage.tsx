@@ -8,7 +8,6 @@ import { PlantillasMapeoSeccion } from './PlantillasMapeoSeccion';
 import { ProduccionSeccion } from './ProduccionSeccion';
 import { PuntosVentaSeccion } from './PuntosVentaSeccion';
 import { TarifasSeccion } from './TarifasSeccion';
-import { TrackerSeccion } from './TrackerSeccion';
 import { WebhooksSeccion } from './WebhooksSeccion';
 
 const PESTANAS = [
@@ -18,7 +17,6 @@ const PESTANAS = [
   { id: 'plantilla', texto: 'Plantilla PDF' },
   { id: 'produccion', texto: 'Producción' },
   { id: 'tarifas', texto: 'Tarifas' },
-  { id: 'tracker', texto: 'Tracker' },
   { id: 'mapeo', texto: 'Plantillas Excel' },
   { id: 'integraciones', texto: 'Integraciones' },
   { id: 'webhooks', texto: 'Webhooks' },
@@ -60,7 +58,6 @@ export function ConfiguracionPage() {
       {pestana === 'plantilla' && <PlantillaSeccion />}
       {pestana === 'produccion' && <ProduccionSeccion />}
       {pestana === 'tarifas' && <TarifasSeccion />}
-      {pestana === 'tracker' && <TrackerSeccion />}
       {pestana === 'mapeo' && <PlantillasMapeoSeccion />}
       {pestana === 'integraciones' && <IntegracionesSeccion />}
       {pestana === 'webhooks' && <WebhooksSeccion />}

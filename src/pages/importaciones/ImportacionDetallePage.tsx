@@ -3,7 +3,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { AlertaError, Aviso, Boton, Campo, Cargando, Entrada, Etiqueta, Modal, Selector, Tarjeta, Vacio } from '@/components/ui';
 import { ALICUOTAS, cantidad, cuit, dinero, ESTADOS_IMPORTACION, ESTADOS_ITEM, fecha, fechaHora, hoy, ORIGENES, soloFecha, UNIDADES } from '@/lib/formato';
-import type { BaseHoras, Cliente, CondicionIva, EstadoItem, Importacion, ItemFacturable, Moneda, Paginado, TipoComprobante, Unidad } from '@/lib/tipos';
+import type { Cliente, CondicionIva, EstadoItem, Importacion, ItemFacturable, Moneda, Paginado, TipoComprobante, Unidad } from '@/lib/tipos';
 import { useApi } from '@/lib/useApi';
 import { ClienteModal } from '../clientes/ClienteModal';
 import { FormularioTarifa } from '../configuracion/TarifasSeccion';
@@ -52,10 +52,6 @@ export function ImportacionDetallePage() {
   const accionItem = useMutation({
     mutationFn: ({ item, accion }: { item: ItemFacturable; accion: 'descartar' | 'restaurar' }) =>
       pedir<ItemFacturable>(`/importaciones/items/${item.id}/${accion}`, 'POST'),
-    onSuccess: refrescar,
-  });
-  const cambiarBase = useMutation({
-    mutationFn: ({ item, base }: { item: ItemFacturable; base: BaseHoras }) => pedir<ItemFacturable>(`/importaciones/items/${item.id}`, 'PATCH', { baseHoras: base }),
     onSuccess: refrescar,
   });
   const confirmar = useMutation({ mutationFn: () => pedir<Importacion>(`/importaciones/${id}/confirmar`, 'POST'), onSuccess: refrescar });
@@ -144,7 +140,7 @@ export function ImportacionDetallePage() {
           </div>
         }
       >
-        <AlertaError error={items.error ?? accionItem.error ?? cambiarBase.error} />
+        <AlertaError error={items.error ?? accionItem.error} />
         {!items.data ? (
           <Cargando />
         ) : items.data.items.length === 0 ? (
@@ -155,13 +151,12 @@ export function ImportacionDetallePage() {
               <FilaItem
                 key={item.id}
                 item={item}
-                ocupado={(accionItem.isPending && accionItem.variables?.item.id === item.id) || (cambiarBase.isPending && cambiarBase.variables?.item.id === item.id)}
+                ocupado={accionItem.isPending && accionItem.variables?.item.id === item.id}
                 onEditar={() => setEditando(item)}
                 onAsignar={() => setAsignando(item)}
                 onTarifa={() => setTarifaPara(item)}
                 onDescartar={() => accionItem.mutate({ item, accion: 'descartar' })}
                 onRestaurar={() => accionItem.mutate({ item, accion: 'restaurar' })}
-                onBase={(base) => cambiarBase.mutate({ item, base })}
               />
             ))}
           </ul>
@@ -175,7 +170,7 @@ export function ImportacionDetallePage() {
           <FormularioTarifa
             inicial={{
               clienteId: tarifaPara.clienteId ?? undefined,
-              claveExterna: (tarifaPara.metadatos?.tarifa as { claveExterna?: string } | undefined)?.claveExterna ?? tarifaPara.metadatos?.proyecto?.id,
+              claveExterna: (tarifaPara.metadatos?.tarifa as { claveExterna?: string } | undefined)?.claveExterna,
               unidad: tarifaPara.unidad,
               vigenteDesde: `${(soloFecha(tarifaPara.periodoDesde ?? tarifaPara.fecha) || hoy()).slice(0, 7)}-01`,
             }}
@@ -302,7 +297,6 @@ function FilaItem({
   onTarifa,
   onDescartar,
   onRestaurar,
-  onBase,
 }: {
   item: ItemFacturable;
   ocupado: boolean;
@@ -311,12 +305,10 @@ function FilaItem({
   onTarifa: () => void;
   onDescartar: () => void;
   onRestaurar: () => void;
-  onBase: (b: BaseHoras) => void;
 }) {
   const m = item.metadatos ?? {};
   const editable = item.estado === 'VALIDO' || item.estado === 'CON_ERRORES';
   const errorTarifa = item.errores?.some((e) => e.campo === 'precioUnitario' && /tarifa/i.test(e.mensaje));
-  const deTracker = item.origen === 'TRACKER' && item.unidad === 'HORA' && m.horasTrabajadas !== undefined;
   const periodo = item.periodoDesde ? `${fecha(item.periodoDesde)} al ${fecha(item.periodoHasta)}` : item.fecha ? fecha(item.fecha) : null;
   const doc = item.clienteNumeroDocumento
     ? `${item.clienteTipoDocumento ?? ''} ${item.clienteTipoDocumento === 'CUIT' ? cuit(item.clienteNumeroDocumento.replace(/\D/g, '')) : item.clienteNumeroDocumento}`
@@ -328,9 +320,7 @@ function FilaItem({
         <p className="font-medium">{item.descripcion}</p>
         <p className="text-xs text-slate-500">
           {periodo}
-          {m.proyecto && <> · proyecto {m.proyecto.nombre}</>}
           {m.fila !== undefined && <> · fila {String(m.fila)}</>}
-          {m.registros !== undefined && <> · {m.registros} registro(s)</>}
         </p>
         <p className="mt-1">
           {item.cliente ? (
@@ -358,22 +348,6 @@ function FilaItem({
         <p className="text-xs text-slate-500 tabular-nums">
           ≈ {dinero(totalEstimado(item), item.moneda)} con IVA {Number(item.alicuotaIva)} %
         </p>
-        {deTracker && (
-          <div className="mt-1 flex items-center gap-1 text-xs">
-            <span className="text-slate-500">Base:</span>
-            {(['FACTURABLES', 'TRABAJADAS'] as const).map((b) => (
-              <button
-                key={b}
-                type="button"
-                disabled={!editable || ocupado}
-                onClick={() => onBase(b)}
-                className={`rounded px-1.5 py-0.5 ${(m.baseHoras ?? 'FACTURABLES') === b ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'} disabled:opacity-60`}
-              >
-                {b === 'FACTURABLES' ? `facturables ${cantidad(m.horasFacturables ?? 0)}` : `trabajadas ${cantidad(m.horasTrabajadas ?? 0)}`}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
       <div className="lg:col-span-2">
