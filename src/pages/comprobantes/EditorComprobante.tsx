@@ -171,7 +171,9 @@ export function EditorComprobante({
   const cliente = listaClientes.find((c) => c.id === form.clienteId) ?? null;
   const puntoVentaId = form.puntoVentaId || puntosDisponibles[0]?.id || '';
   const letraSugerida = emisor.data && cliente ? sugerirLetra(emisor.data.condicionIva, cliente.condicionIva) : null;
-  const letra: Letra = form.letra ?? letraSugerida ?? 'C';
+  // Sin cliente todavía: la del emisor (un Responsable Inscripto no emite C).
+  const letraPorEmisor: Letra = emisor.data?.condicionIva === 'RESPONSABLE_INSCRIPTO' ? 'A' : 'C';
+  const letra: Letra = form.letra ?? letraSugerida ?? letraPorEmisor;
   const servicios = form.concepto !== 'PRODUCTOS';
 
   const guardar = useMutation({
@@ -395,13 +397,13 @@ export function EditorComprobante({
         <div className="space-y-3">
           {form.lineas.map((l, i) => (
             <div key={i} className="grid gap-2 rounded-md border border-slate-100 p-3 sm:grid-cols-12 sm:items-end">
-              <Campo etiqueta="Descripción" className="sm:col-span-12 lg:col-span-4">
+              <Campo etiqueta="Descripción" className="sm:col-span-12 lg:col-span-3">
                 <Entrada value={l.descripcion} onChange={(e) => cambiarLinea(i, 'descripcion', e.target.value)} maxLength={500} />
               </Campo>
               <Campo etiqueta="Cantidad" className="sm:col-span-2 lg:col-span-1">
                 <Entrada inputMode="decimal" value={l.cantidad} onChange={(e) => cambiarLinea(i, 'cantidad', e.target.value)} />
               </Campo>
-              <Campo etiqueta="Unidad" className="sm:col-span-2 lg:col-span-1">
+              <Campo etiqueta="Unidad" className="sm:col-span-2 lg:col-span-2">
                 <Selector value={l.unidad} onChange={(e) => cambiarLinea(i, 'unidad', e.target.value as Unidad)} className="px-2">
                   {Object.entries(UNIDADES).map(([v, t]) => (
                     <option key={v} value={v}>

@@ -13,7 +13,7 @@ import {
   letraDe,
   numeroComprobante,
   tipoLargo,
-  UNIDADES,
+  unidadTexto,
 } from '@/lib/formato';
 import type { Comprobante } from '@/lib/tipos';
 import { useApi } from '@/lib/useApi';
@@ -318,7 +318,7 @@ function VistaComprobante({ comprobante: c }: { comprobante: Comprobante }) {
                 <tr key={l.id}>
                   <td className="py-2 pr-4">{l.descripcion}</td>
                   <td className="py-2 pr-4 text-right tabular-nums whitespace-nowrap">
-                    {Number(l.cantidad).toLocaleString('es-AR')} {UNIDADES[l.unidad].toLowerCase()}
+                    {Number(l.cantidad).toLocaleString('es-AR')} {unidadTexto(l.unidad, l.cantidad)}
                   </td>
                   <td className="py-2 pr-4 text-right tabular-nums whitespace-nowrap">{dinero(l.precioUnitario, c.moneda)}</td>
                   <td className="py-2 pr-4 text-right tabular-nums">{Number(l.bonificacionPct) ? `${Number(l.bonificacionPct)} %` : '—'}</td>

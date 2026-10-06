@@ -43,6 +43,14 @@ export const CONCEPTOS: Record<Concepto, string> = {
 
 export const UNIDADES: Record<Unidad, string> = { HORA: 'Horas', UNIDAD: 'Unidades', SERVICIO: 'Servicio', MES: 'Mes' };
 
+const UNIDAD_SINGULAR: Record<Unidad, string> = { HORA: 'hora', UNIDAD: 'unidad', SERVICIO: 'servicio', MES: 'mes' };
+const UNIDAD_PLURAL: Record<Unidad, string> = { HORA: 'horas', UNIDAD: 'unidades', SERVICIO: 'servicios', MES: 'meses' };
+
+/** "1 hora", "2,5 horas"; sin cantidad, el singular (para "$ 20 / hora"). */
+export function unidadTexto(unidad: Unidad, cantidad?: string | number): string {
+  return cantidad !== undefined && Number(cantidad) !== 1 ? UNIDAD_PLURAL[unidad] : UNIDAD_SINGULAR[unidad];
+}
+
 export const ALICUOTAS = ['21', '10.5', '27', '5', '2.5', '0'];
 
 export const ORIGENES: Record<OrigenItem, string> = { TRACKER: 'Time tracker', API: 'API', EXCEL: 'Excel / CSV', MANUAL: 'Carga manual' };

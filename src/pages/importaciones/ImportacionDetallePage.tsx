@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { AlertaError, Aviso, Boton, Campo, Cargando, Entrada, Etiqueta, Modal, Selector, Tarjeta, Vacio } from '@/components/ui';
-import { ALICUOTAS, cantidad, cuit, dinero, ESTADOS_IMPORTACION, ESTADOS_ITEM, fecha, fechaHora, hoy, ORIGENES, soloFecha, UNIDADES } from '@/lib/formato';
+import { ALICUOTAS, cantidad, cuit, dinero, ESTADOS_IMPORTACION, ESTADOS_ITEM, fecha, fechaHora, hoy, ORIGENES, soloFecha, UNIDADES, unidadTexto } from '@/lib/formato';
 import type { Cliente, CondicionIva, EstadoItem, Importacion, ItemFacturable, Moneda, Paginado, TipoComprobante, Unidad } from '@/lib/tipos';
 import { useApi } from '@/lib/useApi';
 import { ClienteModal } from '../clientes/ClienteModal';
@@ -342,7 +342,7 @@ function FilaItem({
 
       <div className="lg:col-span-3">
         <p className="tabular-nums">
-          {cantidad(item.cantidad)} {UNIDADES[item.unidad].toLowerCase()} × {dinero(item.precioUnitario, item.moneda)}
+          {cantidad(item.cantidad)} {unidadTexto(item.unidad, item.cantidad)} × {dinero(item.precioUnitario, item.moneda)}
           {m.precioDeTarifa && m.tarifaId && <span className="ml-1 text-xs text-slate-500">(tarifa)</span>}
         </p>
         <p className="text-xs text-slate-500 tabular-nums">

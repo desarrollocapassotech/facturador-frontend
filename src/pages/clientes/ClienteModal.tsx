@@ -55,6 +55,9 @@ export function ClienteModal({
 
   function cambiar<K extends keyof typeof form>(campo: K, valor: (typeof form)[K]) {
     setForm((f) => ({ ...f, [campo]: valor }));
+    // Un error viejo confunde una vez que el dato cambió.
+    if (guardar.isError) guardar.reset();
+    if (campo === 'numeroDocumento' && padron.isError) padron.reset();
   }
 
   const padron = useMutation({
@@ -104,8 +107,8 @@ export function ClienteModal({
   return (
     <Modal abierto={abierto} titulo={cliente ? 'Editar cliente' : 'Nuevo cliente'} onCerrar={onCerrar}>
       <form onSubmit={enviar} className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Campo etiqueta="Tipo de documento">
+        <div className="grid gap-4 sm:grid-cols-5">
+          <Campo etiqueta="Tipo de documento" className="sm:col-span-2">
             <Selector value={form.tipoDocumento} onChange={(e) => cambiar('tipoDocumento', e.target.value as TipoDocumento)}>
               {Object.entries(TIPOS_DOCUMENTO).map(([v, t]) => (
                 <option key={v} value={v}>
@@ -115,7 +118,7 @@ export function ClienteModal({
             </Selector>
           </Campo>
           {!sinDocumento && (
-            <Campo etiqueta="Número">
+            <Campo etiqueta="Número" className="sm:col-span-3">
               <div className="flex gap-2">
                 <Entrada
                   value={form.numeroDocumento}

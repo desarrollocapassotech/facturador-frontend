@@ -85,7 +85,7 @@ function FormularioEmisor({ emisor }: { emisor: Emisor }) {
           <Campo etiqueta="Ingresos brutos" ayuda="Opcional. Se imprime en el PDF.">
             <Entrada value={form.ingresosBrutos} onChange={(e) => cambiar('ingresosBrutos', e.target.value)} maxLength={40} />
           </Campo>
-          <Campo etiqueta="Inicio de actividades" ayuda="Opcional. Se imprime en el PDF.">
+          <Campo etiqueta="Inicio de actividades" ayuda="Obligatorio para emitir. Se imprime en el PDF.">
             <Entrada type="date" value={form.inicioActividades} onChange={(e) => cambiar('inicioActividades', e.target.value)} />
           </Campo>
         </div>

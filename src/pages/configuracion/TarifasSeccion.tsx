@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { AlertaError, Boton, Campo, Cargando, Entrada, Selector, Tarjeta, Vacio } from '@/components/ui';
-import { ALICUOTAS, dinero, fecha, hoy, ORIGENES, UNIDADES } from '@/lib/formato';
+import { ALICUOTAS, dinero, fecha, hoy, ORIGENES, UNIDADES, unidadTexto } from '@/lib/formato';
 import type { Cliente, Moneda, OrigenItem, Tarifa, Unidad } from '@/lib/tipos';
 import { useApi } from '@/lib/useApi';
 
@@ -61,7 +61,7 @@ export function TarifasSeccion() {
                       {t.origen ? ORIGENES[t.origen] : 'Cualquier origen'}
                     </td>
                     <td className="py-2 pr-4 text-right whitespace-nowrap tabular-nums">
-                      {dinero(t.precioUnitario, t.moneda)} / {UNIDADES[t.unidad].toLowerCase()}
+                      {dinero(t.precioUnitario, t.moneda)} / {unidadTexto(t.unidad)}
                       <span className="block text-xs text-slate-500">IVA {Number(t.alicuotaIva)} %</span>
                     </td>
                     <td className="py-2 pr-4 whitespace-nowrap text-xs">
