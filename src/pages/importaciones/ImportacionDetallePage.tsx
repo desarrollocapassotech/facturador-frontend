@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { AlertaError, Aviso, Boton, Campo, Cargando, Entrada, Etiqueta, Modal, Selector, Tarjeta, Vacio } from '@/components/ui';
+import { AlertaError, Aviso, Boton, Campo, Cargando, Entrada, EntradaNumero, Etiqueta, Modal, Selector, Tarjeta, Vacio } from '@/components/ui';
 import { ALICUOTAS, cantidad, cuit, dinero, ESTADOS_IMPORTACION, ESTADOS_ITEM, fecha, fechaHora, hoy, ORIGENES, soloFecha, UNIDADES, unidadTexto } from '@/lib/formato';
 import type { Cliente, CondicionIva, EstadoItem, Importacion, ItemFacturable, Moneda, Paginado, TipoComprobante, Unidad } from '@/lib/tipos';
 import { useApi } from '@/lib/useApi';
@@ -444,7 +444,7 @@ function EditarItemModal({ item, onCerrar, onGuardado }: { item: ItemFacturable;
         </Campo>
         <div className="grid gap-4 sm:grid-cols-2">
           <Campo etiqueta="Cantidad">
-            <Entrada inputMode="decimal" value={form.cantidad} onChange={(e) => cambiar('cantidad', e.target.value)} required />
+            <EntradaNumero value={form.cantidad} onValueChange={(v) => cambiar('cantidad', v)} required />
           </Campo>
           <Campo etiqueta="Unidad">
             <Selector value={form.unidad} onChange={(e) => cambiar('unidad', e.target.value as Unidad)}>
@@ -463,7 +463,7 @@ function EditarItemModal({ item, onCerrar, onGuardado }: { item: ItemFacturable;
         {!form.usarTarifa && (
           <div className="grid gap-4 sm:grid-cols-3">
             <Campo etiqueta="Precio (sin IVA)">
-              <Entrada inputMode="decimal" value={form.precioUnitario} onChange={(e) => cambiar('precioUnitario', e.target.value)} required />
+              <EntradaNumero value={form.precioUnitario} onValueChange={(v) => cambiar('precioUnitario', v)} required />
             </Campo>
             <Campo etiqueta="Moneda">
               <Selector value={form.moneda} onChange={(e) => cambiar('moneda', e.target.value as Moneda)}>

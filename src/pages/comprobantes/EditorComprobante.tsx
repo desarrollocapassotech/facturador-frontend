@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertaError, Aviso, Boton, Campo, Cargando, Entrada, Selector, Tarjeta, claseInput } from '@/components/ui';
+import { AlertaError, Aviso, Boton, Campo, Cargando, claseInput, Entrada, EntradaNumero, Selector, Tarjeta } from '@/components/ui';
 import { ALICUOTAS, CONCEPTOS, conLetra, dinero, hoy, soloFecha, sugerirLetra, UNIDADES } from '@/lib/formato';
 import type { Cliente, Comprobante, Concepto, Emisor, Linea, Moneda, PuntoVenta, Unidad } from '@/lib/tipos';
 import { useApi } from '@/lib/useApi';
@@ -401,7 +401,7 @@ export function EditorComprobante({
                 <Entrada value={l.descripcion} onChange={(e) => cambiarLinea(i, 'descripcion', e.target.value)} maxLength={500} />
               </Campo>
               <Campo etiqueta="Cantidad" className="sm:col-span-2 lg:col-span-1">
-                <Entrada inputMode="decimal" value={l.cantidad} onChange={(e) => cambiarLinea(i, 'cantidad', e.target.value)} />
+                <EntradaNumero value={l.cantidad} onValueChange={(v) => cambiarLinea(i, 'cantidad', v)} />
               </Campo>
               <Campo etiqueta="Unidad" className="sm:col-span-2 lg:col-span-2">
                 <Selector value={l.unidad} onChange={(e) => cambiarLinea(i, 'unidad', e.target.value as Unidad)} className="px-2">
@@ -413,10 +413,10 @@ export function EditorComprobante({
                 </Selector>
               </Campo>
               <Campo etiqueta={letra === 'C' ? 'Precio unitario' : 'Precio unit. (sin IVA)'} className="sm:col-span-3 lg:col-span-2">
-                <Entrada inputMode="decimal" value={l.precioUnitario} onChange={(e) => cambiarLinea(i, 'precioUnitario', e.target.value)} />
+                <EntradaNumero value={l.precioUnitario} onValueChange={(v) => cambiarLinea(i, 'precioUnitario', v)} />
               </Campo>
               <Campo etiqueta="Bonif. %" className="sm:col-span-2 lg:col-span-1">
-                <Entrada inputMode="decimal" value={l.bonificacionPct} onChange={(e) => cambiarLinea(i, 'bonificacionPct', e.target.value)} />
+                <EntradaNumero value={l.bonificacionPct} onValueChange={(v) => cambiarLinea(i, 'bonificacionPct', v)} />
               </Campo>
               {letra !== 'C' && (
                 <Campo etiqueta="IVA %" className="sm:col-span-2 lg:col-span-1">

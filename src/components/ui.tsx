@@ -1,5 +1,6 @@
 import { useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from 'react';
 import { ApiError } from '@/lib/api';
+import { leerNumero, numeroEditable } from '@/lib/numeros';
 
 export const claseInput =
   'w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 disabled:bg-slate-100 disabled:text-slate-500';
@@ -44,6 +45,47 @@ export function Campo({ etiqueta, ayuda, children, className = '' }: { etiqueta:
 
 export function Entrada(props: InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={`${claseInput} ${props.className ?? ''}`} />;
+}
+
+/**
+ * Campo numérico en formato argentino: muestra "30.800" o "1.540,50" y se escribe con coma decimal
+ * (también acepta el punto por costumbre). Devuelve el valor normalizado ("1540.5"; "" si no es un número).
+ */
+export function EntradaNumero({
+  value,
+  onValueChange,
+  maxDecimales = 2,
+  onFocus,
+  onBlur,
+  ...props
+}: Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'onChange'> & {
+  value: string | number | null | undefined;
+  onValueChange: (valor: string) => void;
+  maxDecimales?: number;
+}) {
+  const [editando, setEditando] = useState<string | null>(null);
+  return (
+    <Entrada
+      {...props}
+      type="text"
+      inputMode="decimal"
+      autoComplete="off"
+      value={editando ?? numeroEditable(value, maxDecimales)}
+      onFocus={(e) => {
+        setEditando(numeroEditable(value, maxDecimales));
+        onFocus?.(e);
+      }}
+      onChange={(e) => {
+        setEditando(e.target.value);
+        const n = leerNumero(e.target.value);
+        onValueChange(n === null ? '' : String(n));
+      }}
+      onBlur={(e) => {
+        setEditando(null);
+        onBlur?.(e);
+      }}
+    />
+  );
 }
 
 export function Selector(props: SelectHTMLAttributes<HTMLSelectElement>) {

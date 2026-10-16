@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
-import { AlertaError, Aviso, Boton, Campo, Entrada, Selector, Tarjeta, claseInput } from '@/components/ui';
+import { AlertaError, Aviso, Boton, Campo, claseInput, Entrada, EntradaNumero, Selector, Tarjeta } from '@/components/ui';
 import { cuit, dinero, fecha, hoy, numeroComprobante, tipoLargo } from '@/lib/formato';
 import type { Cliente, ComprobanteResumen, Moneda, Paginado } from '@/lib/tipos';
 import { useApi } from '@/lib/useApi';
@@ -334,10 +334,9 @@ export function RecibosPage() {
                 <Entrada value={it.cantidad} onChange={(e) => cambiarItem(i, 'cantidad', e.target.value)} maxLength={40} placeholder="80 hs" />
               </Campo>
               <Campo etiqueta="Importe" className="sm:col-span-3">
-                <Entrada
-                  inputMode="decimal"
+                <EntradaNumero
                   value={it.importe}
-                  onChange={(e) => cambiarItem(i, 'importe', e.target.value)}
+                  onValueChange={(v) => cambiarItem(i, 'importe', v)}
                   required
                   aria-invalid={it.importe !== '' && centavos[i] === null}
                   className={it.importe !== '' && centavos[i] === null ? 'border-red-400' : ''}

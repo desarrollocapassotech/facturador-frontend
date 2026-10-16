@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
-import { AlertaError, Boton, Campo, Cargando, Entrada, Selector, Tarjeta, Vacio } from '@/components/ui';
+import { AlertaError, Boton, Campo, Cargando, Entrada, EntradaNumero, Selector, Tarjeta, Vacio } from '@/components/ui';
 import { ALICUOTAS, dinero, fecha, hoy, ORIGENES, UNIDADES, unidadTexto } from '@/lib/formato';
 import type { Cliente, Moneda, OrigenItem, Tarifa, Unidad } from '@/lib/tipos';
 import { useApi } from '@/lib/useApi';
@@ -166,7 +166,7 @@ export function FormularioTarifa({ inicial, onCreada }: { inicial?: TarifaInicia
           </Selector>
         </Campo>
         <Campo etiqueta="Precio unitario (sin IVA)">
-          <Entrada inputMode="decimal" value={form.precioUnitario} onChange={(e) => cambiar('precioUnitario', e.target.value)} required />
+          <EntradaNumero value={form.precioUnitario} onValueChange={(v) => cambiar('precioUnitario', v)} required />
         </Campo>
         <Campo etiqueta="Moneda">
           <Selector value={form.moneda} onChange={(e) => cambiar('moneda', e.target.value as Moneda)}>
