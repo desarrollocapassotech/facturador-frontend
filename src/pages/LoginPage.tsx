@@ -16,6 +16,7 @@ export function LoginPage() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [verPassword, setVerPassword] = useState(false);
   const [tenants, setTenants] = useState<OpcionTenant[] | null>(null);
   const [tenantSlug, setTenantSlug] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -77,16 +78,33 @@ export function LoginPage() {
             <label htmlFor="password" className="text-sm font-medium">
               Contraseña
             </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              disabled={tenants !== null}
-              onChange={(e) => setPassword(e.target.value)}
-              className={inputClase}
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={verPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                required
+                value={password}
+                disabled={tenants !== null}
+                onChange={(e) => setPassword(e.target.value)}
+                className={`${inputClase} pr-10`}
+              />
+              <button
+                type="button"
+                onClick={() => setVerPassword((v) => !v)}
+                disabled={tenants !== null}
+                aria-label={verPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                aria-pressed={verPassword}
+                title={verPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                className="absolute inset-y-0 right-0 flex w-10 items-center justify-center rounded-r-md text-slate-500 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 disabled:opacity-50"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" />
+                  <circle cx="12" cy="12" r="3" />
+                  {verPassword && <path d="M3 3l18 18" />}
+                </svg>
+              </button>
+            </div>
           </div>
 
           {tenants && (
